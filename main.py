@@ -17,6 +17,7 @@ class manga_scraper(discord.Client):
 
         if message.content.startswith('=shut_down') and message.author.id == 277375456523714560:
             await message.channel.send('Shutting down.')
+            await self.close()
             exit()
         elif message.content.startswith('=hello'):
             await message.channel.send(f'Hiiii {message.author.display_name}!!')
