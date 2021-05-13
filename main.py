@@ -18,12 +18,11 @@ class manga_scraper(discord.Client):
         if message.content.startswith('=shut_down') and message.author.id == 277375456523714560:
             await message.channel.send('Shutting down.')
             await self.close()
-            exit()
         elif message.content.startswith('=hello'):
             await message.channel.send(f'Hiiii {message.author.display_name}!!')
         elif message.content.startswith('=check_manga'):
             if len(message.content) < 14:
-                await download_chapter(message,db.keys())
+                await download_chapter(message,db.keys(),verbose=True)
             else:
                 arguments = message.content.split(' ')
                 titles_set = set(arguments[1:])
@@ -40,7 +39,7 @@ class manga_scraper(discord.Client):
         elif message.content.startswith('=list_manga'):
             await message.channel.send('\n'.join(db.keys()))
 
-async def download_chapter(message,key_list):
+async def download_chapter(message,key_list,verbose):
     #spoofed headers to avoid 403 Forbidden
     spoofed_user_agent_headers = {'User-Agent':'Chrome/23.0.1271.64'}
 
@@ -57,10 +56,12 @@ async def download_chapter(message,key_list):
             soup, image_tags = await download_images1(chapter,session) #validates amount of images
 
             if str(chapter.url) != link or soup == None:
-                await message.channel.send(f'No new chapter found for {title}.')
+                if verbose:
+                    await message.channel.send(f'No new chapter found for {title}.')
                 continue
             else:
-                await message.channel.send(f'Found new chapter for {title}. Downloading.')
+                if verbose:
+                    await message.channel.send(f'Found new chapter for {title}. Downloading.')
 
             #creates images array for PIL.Image objects and name of pdf
             pdf_name = soup.h1.get_text()+'.pdf'
